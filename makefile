@@ -20,6 +20,16 @@ up-docker: ## Levantar toda la infraestructura base con Docker Compose
 down-docker: ## Detener infraestructura y eliminar volúmenes persistentes
 	docker compose down -v
 
+test-unit: ## Ejecutar pruebas unitarias locales
+	PYTHONPATH=. pytest tests/unit/ -v
+
+test-ci: ## Ejecuta el patrón SUT completo (Construye imagen, testea en BD efímera y destruye)
+	docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+	docker compose -f docker-compose.test.yml down -v
+
+test-all: ## Ejecutar toda la suite localmente
+	PYTHONPATH=. pytest tests/ -v
+
 clean: ## Elimina cachés y archivos temporales
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true

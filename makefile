@@ -14,6 +14,14 @@ run-etl: infra-up ## Enciende la BD y luego ejecuta el pipeline de extracción y
 	@echo "Ejecutando el Pipeline ETL..."
 	export DATABASE_URL="postgresql+psycopg2://admin:password123@localhost:5432/condor_analytics" && python3 -m src.pipeline
 
+app-up: run-etl ## El comando supremo: BD -> ETL -> Dashboard
+	@echo "Levantando la interfaz visual..."
+	docker compose up -d dashboard
+	@echo "Sistema completo en línea. Visita: http://localhost:8501"
+
+app-down: ## Apaga toda la infraestructura de producción
+	docker compose down
+
 up-docker: ## Levantar toda la infraestructura base con Docker Compose
 	docker compose up -d
 
@@ -35,6 +43,9 @@ clean: ## Elimina cachés y archivos temporales
 	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
 	rm -f data/*sanitizado.csv
 	@echo "Entorno limpio."
+
+all: clean test-ci app-up ## Purga, pasa tests en Docker aislando errores y despliega a producción
+	@echo "Integración y Despliegue Continuo finalizado con éxito."
 
 help: ## Mostrar ayuda
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk -F':|##' '{printf "  %-15s %s\n", $$1, $$3}'

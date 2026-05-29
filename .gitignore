@@ -1,5 +1,5 @@
 venv
-/pycache
+*pycache
 *.pyc
 *.pyo
 *.pyd

@@ -1,0 +1,27 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: condor_postgres_prod
+    environment:
+      POSTGRES_USER: ${PROD_DB_USER}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+      POSTGRES_DB: ${PROD_DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: condor_streamlit_ui
+    ports:
+      - "8501:8501"
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres-db:5432/${PROD_DB_NAME}
+    depends_on:
+      - postgres-db
+
+volumes:
+  postgres_data:

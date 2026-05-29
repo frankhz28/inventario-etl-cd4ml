@@ -1,7 +1,9 @@
 venv
-/pycache
+*pycache
 *.pyc
 *.pyo
 *.pyd
 __pycache__/
 .env
+test_database_en_memoria.db
+data/*sanitizado.csv
